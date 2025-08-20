@@ -1,3 +1,7 @@
 *.iso
 isodir
 sysroot
+/kernel-deps
+/limine
+/ovmf
+*.hdd
