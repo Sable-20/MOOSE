@@ -81,6 +81,7 @@ override CFLAGS += \
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
+    -I ../libc/include \
     -I src \
     -I limine-protocol/include \
     -isystem freestnd-c-hdrs/include \
