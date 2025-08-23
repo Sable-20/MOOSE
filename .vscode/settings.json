@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.md": "markdown",
+    "limine.h": "c",
+    "stdlib.h": "c"
+  }
+}
