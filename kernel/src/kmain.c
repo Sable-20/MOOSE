@@ -5,7 +5,48 @@
 #include <limine.h>
 
 #include <string.h>
-#include <stdlib.h>
+// #include "../../lib/include/stdlib.h"
+
+#include <kernel/pmm/pmm.h>
+
+static unsigned long liballoc_irqflags;
+
+int liballoc_lock(void)
+{
+    liballoc_irqflags = irq_save();
+    return 0;
+}
+
+int liballoc_unlock(void)
+{
+    // Release lock first, then restore IF for this CPU.
+    irq_restore(liballoc_irqflags);
+    return 0;
+}
+
+void *liballoc_alloc(size_t pages)
+{
+    if (pages == 0)
+        return NULL;
+
+    uintptr_t phys = pmm_alloc_pages(pages);
+    if (!phys)
+        return NULL;
+
+    return phys_to_virt(phys);
+}
+
+int liballoc_free(void *ptr, size_t pages)
+{
+    if (!ptr || pages == 0)
+        return 0;
+
+    uintptr_t phys = virt_to_phys(ptr);
+    pmm_free_pages(phys, pages);
+    return 0;
+}
+
+// #include "../include/kernel/pmm/pmm.h"
 
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -55,6 +96,8 @@ void kmain(void)
     {
         hcf();
     }
+
+    pmm_init_after_kernel();
 
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1)

@@ -45,7 +45,9 @@ endif
 CFLAGS := -g -O2 -pipe
 
 # User controllable C preprocessor flags. We set none by default.
-CPPFLAGS :=
+CPPFLAGS := \
+    -I ../libc/include \
+    -I include/
 
 ifeq ($(ARCH),x86_64)
     # User controllable nasm flags.
@@ -81,7 +83,6 @@ override CFLAGS += \
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
-    -I ../libc/include \
     -I src \
     -I limine-protocol/include \
     -isystem freestnd-c-hdrs/include \

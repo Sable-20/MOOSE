@@ -2,6 +2,9 @@
   "files.associations": {
     "*.md": "markdown",
     "limine.h": "c",
-    "stdlib.h": "c"
-  }
+    "stdlib.h": "c",
+    "pmm.h": "c",
+    "string.h": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }
