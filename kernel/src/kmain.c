@@ -8,6 +8,23 @@
 // #include "../../lib/include/stdlib.h"
 
 #include <kernel/pmm/pmm.h>
+#include "../include/kernel/stdio/kstdio.h"
+#include "../include/kernel/ssfn/ssfn.h"
+
+// Set the base revision to 3, this is recommended as this is the latest
+// base revision described by the Limine boot protocol specification.
+// See specification for further info.
+
+__attribute__((used, section(".limine_requests"))) static volatile LIMINE_BASE_REVISION(3);
+
+// The Limine requests can be placed anywhere, but it is important that
+// the compiler does not optimise them away, so, usually, they should
+// be made volatile or equivalent, _and_ they should be accessed at least
+// once or marked as used with the "used" attribute as done here.
+
+__attribute__((used, section(".limine_requests"))) static volatile struct limine_framebuffer_request framebuffer_request = {
+    .id = LIMINE_FRAMEBUFFER_REQUEST,
+    .revision = 0};
 
 static unsigned long liballoc_irqflags;
 
@@ -47,21 +64,6 @@ int liballoc_free(void *ptr, size_t pages)
 }
 
 // #include "../include/kernel/pmm/pmm.h"
-
-// Set the base revision to 3, this is recommended as this is the latest
-// base revision described by the Limine boot protocol specification.
-// See specification for further info.
-
-__attribute__((used, section(".limine_requests"))) static volatile LIMINE_BASE_REVISION(3);
-
-// The Limine requests can be placed anywhere, but it is important that
-// the compiler does not optimise them away, so, usually, they should
-// be made volatile or equivalent, _and_ they should be accessed at least
-// once or marked as used with the "used" attribute as done here.
-
-__attribute__((used, section(".limine_requests"))) static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST,
-    .revision = 0};
 
 // Finally, define the start and end markers for the Limine requests.
 // These can also be moved anywhere, to any .c file, as seen fit.
@@ -105,15 +107,19 @@ void kmain(void)
         hcf();
     }
 
+    init_ssfn();
+
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    for (size_t i = 0; i < 100; i++)
-    {
-        volatile uint32_t *fb_ptr = framebuffer->address;
-        fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-    }
+    kout("Hello World", 50, 50);
+
+    //     // Note: we assume the framebuffer model is RGB with 32-bit pixels.
+    //     for (size_t i = 0; i < 100; i++)
+    // {
+    //     volatile uint32_t *fb_ptr = framebuffer->address;
+    //     fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
+    // }
 
     // We're done, just hang...
     hcf();

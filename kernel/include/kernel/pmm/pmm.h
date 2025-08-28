@@ -229,12 +229,6 @@ void pmm_init_after_kernel(void)
     if ((p / 8) < pmm_bitmap_bytes)
       BIT_SET(p);
   }
-
-  /* 7) Finally, mark any other reserved ranges (ACPI, BIOS, etc.) as used so they won't be handed out.
-     (iterate memmap and set bits for non-USABLE types similarly if you want) */
-
-  /* PMM ready. If you keep a global variable for total pages and bitmap bytes,
-     your alloc/free routines can reference them (not shown here). */
 }
 
 uintptr_t pmm_alloc_pages(size_t pages)
