@@ -4,13 +4,12 @@
 #include <stdio.h>
 
 #include <limine.h>
-
 #include <string.h>
-// #include "../../lib/include/stdlib.h"
 
 #include <kernel/pmm/pmm.h>
 #include <kernel/stdio/kstdio.h>
-#include <framebuffer/framebuffer.h>
+
+#include "font.h"
 
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -64,6 +63,10 @@ __attribute__((used, section(".limine_requests_start"))) static volatile LIMINE_
 
 __attribute__((used, section(".limine_requests_end"))) static volatile LIMINE_REQUESTS_END_MARKER;
 
+__attribute__((used, section(".limine_requests"))) static volatile struct limine_framebuffer_request framebuffer_request = {
+    .id = LIMINE_FRAMEBUFFER_REQUEST,
+    .revision = 0};
+
 // // Halt and catch fire function.
 // i dont know why this cant be somewhere else, it just doesnt work for whatever reason
 static void hcf(void)
@@ -102,11 +105,13 @@ void kmain(void)
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
     // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    for (size_t i = 0; i < 100; i++)
-    {
-        volatile uint32_t *fb_ptr = framebuffer->address;
-        fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-    }
+    // for (size_t i = 0; i < 100; i++)
+    // {
+    //     volatile uint32_t *fb_ptr = framebuffer->address;
+    //     fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
+    // }
+
+    drawchar(framebuffer, 'A', 50, 50, 0xFFFFFFFF, 0x00000000);
 
     // We're done, just hang...
     hcf();
