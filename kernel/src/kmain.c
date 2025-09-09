@@ -9,8 +9,6 @@
 #include <kernel/pmm/pmm.h>
 #include <kernel/stdio/kstdio.h>
 
-#include "font.h"
-
 // Set the base revision to 3, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
 // See specification for further info.
@@ -95,7 +93,6 @@ void kmain(void)
     }
 
     pmm_init_after_kernel();
-
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1)
     {
@@ -105,14 +102,11 @@ void kmain(void)
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
     // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    // for (size_t i = 0; i < 100; i++)
-    // {
-    //     volatile uint32_t *fb_ptr = framebuffer->address;
-    //     fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-    // }
-
-    drawchar(framebuffer, 'A', 50, 50, 0xFFFFFFFF, 0x00000000);
-
+    for (size_t i = 0; i < 100; i++)
+    {
+        volatile uint32_t *fb_ptr = framebuffer->address;
+        fb_ptr[(framebuffer->pitch / 4) + i] = 0xffffff;
+    }
     // We're done, just hang...
     hcf();
 }
